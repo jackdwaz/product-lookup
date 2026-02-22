@@ -1,12 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LG Product Lookup</title>
-
 <link rel="icon" type="image/svg+xml" href="https://upload.wikimedia.org/wikipedia/commons/2/20/LG_symbol.svg">
-
 <style>
 
 :root{
@@ -19,18 +16,19 @@
 body.dark{
   --bg:#121212;
   --card:#1e1e1e;
-  --text:#f1f1f1;
-  --sub:#bdbdbd;
+  --text:#f5f5f5;
+  --sub:#bbbbbb;
 }
 
 body{
   margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial;
+  font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
   background:var(--bg);
   color:var(--text);
 }
 
-/* Header */
+/* HEADER */
+
 .header{
   background:linear-gradient(135deg,#a50034,#d81b60);
   color:white;
@@ -44,31 +42,35 @@ body{
 .toggle{
   background:white;
   border:none;
-  border-radius:20px;
-  padding:6px 12px;
+  padding:6px 10px;
+  border-radius:6px;
   cursor:pointer;
-  font-weight:bold;
+  font-size:12px;
 }
 
-/* Container */
-.container{ padding:15px; }
+/* CONTAINER */
 
-/* Inputs */
+.container{
+  padding:15px;
+}
+
 input,select{
   width:100%;
   padding:10px;
   margin-bottom:10px;
   border-radius:8px;
-  border:1px solid #ddd;
+  border:1px solid #ccc;
   background:var(--card);
   color:var(--text);
 }
 
-/* Summary */
+/* DASHBOARD */
+
 .summary{
   display:flex;
   gap:10px;
   margin-bottom:12px;
+  flex-wrap:wrap;
 }
 
 .summary-card{
@@ -86,16 +88,27 @@ input,select{
   font-weight:bold;
 }
 
-/* Product Card */
+/* LOCATION DASH */
+
+.locationDash{
+  background:var(--card);
+  border-radius:10px;
+  padding:10px;
+  margin-bottom:12px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.15);
+}
+
+/* PRODUCT CARD */
+
 .product{
   background:var(--card);
   border-radius:12px;
   padding:12px;
   margin-bottom:12px;
-  box-shadow:0 6px 14px rgba(0,0,0,0.18);
   display:flex;
   gap:12px;
   align-items:center;
+  box-shadow:0 6px 14px rgba(0,0,0,0.15);
 }
 
 .product img{
@@ -103,11 +116,12 @@ input,select{
   height:90px;
   object-fit:contain;
   border-radius:8px;
-  background:#fafafa;
   cursor:pointer;
 }
 
-.details{ flex:1; }
+.details{
+  flex:1;
+}
 
 .sku{
   font-weight:bold;
@@ -119,83 +133,76 @@ input,select{
   color:var(--sub);
 }
 
-.description{
-  font-size:14px;
-  margin-top:4px;
-}
-
 .badge{
   display:inline-block;
   padding:3px 10px;
   border-radius:20px;
   font-size:12px;
   font-weight:bold;
-  margin-top:6px;
+  margin-top:5px;
 }
 
-.in{ background:#e8f5e9; color:#2e7d32; }
-.out{ background:#ffebee; color:#c62828; }
+.in{background:#e8f5e9;color:#2e7d32;}
+.out{background:#ffebee;color:#c62828;}
 
-/* Image Modal */
+.no-result{
+  text-align:center;
+  margin-top:20px;
+}
+
+/* IMAGE MODAL */
+
 .modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.9);
   display:none;
+  position:fixed;
+  z-index:999;
+  left:0;
+  top:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.9);
   justify-content:center;
   align-items:center;
-  z-index:999;
 }
 
 .modal img{
   max-width:95%;
   max-height:95%;
-  object-fit:contain;
+  border-radius:10px;
 }
 
-.no-result{
-  text-align:center;
-  margin-top:20px;
-  color:var(--sub);
+.close{
+  position:absolute;
+  top:20px;
+  right:20px;
+  color:white;
+  font-size:30px;
+  cursor:pointer;
 }
 
 </style>
 </head>
-
 <body>
-
 <div class="header">
   <h2>LG Product Lookup</h2>
-  <button class="toggle" onclick="toggleDark()">🌙</button>
+  <button class="toggle" onclick="toggleDark()">🌙 Dark</button>
 </div>
-
 <div class="container">
-
-<input type="text" id="search" placeholder="Enter full or partial SKU">
-
+<input type="text" id="search" placeholder="Enter SKU">
 <select id="categoryFilter">
 <option value="">All Categories</option>
-<option value="Washing Machine">Washing Machine</option>
-<option value="TV">TV</option>
-<option value="AC">AC</option>
-<option value="Dish Washer">Dish Washer</option>
-<option value="Water Purifier">Water Purifier</option>
-<option value="Microwave Oven">Microwave Oven</option>
-<option value="Refrigerator">Refrigerator</option>
-<option value="AV">AV</option>
+<option>Washing Machine</option>
+<option>TV</option>
+<option>AC</option>
+<option>Dish Washer</option>
+<option>Water Purifier</option>
+<option>Microwave Oven</option>
+<option>Refrigerator</option>
+<option>AV</option>
 </select>
-
 <select id="typeFilter">
 <option value="">All Types</option>
-<option value="Front Load">Front Load</option>
-<option value="Top Load">Top Load</option>
-<option value="Automatic">Automatic</option>
-<option value="Semi-Automatic">Semi-Automatic</option>
-<option value="Essential">Essential</option>
-<option value="XBoom">XBoom</option>
-<option value="SoundBar">SoundBar</option>
 </select>
-
 <select id="ratingFilter">
 <option value="">All Ratings</option>
 <option value="1">⭐</option>
@@ -204,48 +211,51 @@ input,select{
 <option value="4">⭐⭐⭐⭐</option>
 <option value="5">⭐⭐⭐⭐⭐</option>
 </select>
-
 <select id="stockFilter">
 <option value="">All Stock</option>
 <option value="in">In Stock</option>
 <option value="out">Out of Stock</option>
 </select>
-
-<!-- SUMMARY -->
+<select id="locationFilter">
+<option value="">All Locations</option>
+</select>
 <div class="summary">
-  <div class="summary-card">Total<span id="totalCount">0</span></div>
-  <div class="summary-card">In Stock<span id="inStockCount">0</span></div>
-  <div class="summary-card">Out<span id="outStockCount">0</span></div>
+  <div class="summary-card">Total Models <span id="totalCount">0</span></div>
+  <div class="summary-card">In Stock <span id="inStockCount">0</span></div>
+  <div class="summary-card">Out Stock <span id="outStockCount">0</span></div>
 </div>
-
+<div class="locationDash" id="locationDash"></div>
 <div id="results"></div>
-
 </div>
-
-<!-- IMAGE MODAL -->
-<div class="modal" id="imgModal" onclick="closeModal()">
+<div class="modal" id="imgModal">
+  <span class="close" onclick="closeModal()">×</span>
   <img id="modalImg">
 </div>
-
 <script>
 
 let products=[];
 
-/* ELEMENTS */
-const search=document.getElementById("search");
-const categoryFilter=document.getElementById("categoryFilter");
-const typeFilter=document.getElementById("typeFilter");
-const ratingFilter=document.getElementById("ratingFilter");
-const stockFilter=document.getElementById("stockFilter");
+/* CATEGORY → TYPE MAP */
 
-const totalCount=document.getElementById("totalCount");
-const inStockCount=document.getElementById("inStockCount");
-const outStockCount=document.getElementById("outStockCount");
-const results=document.getElementById("results");
+const typeMap={
+"TV":["HD Ready","FHD","UHD","OLED","NanoCell"],
+"Washing Machine":["Top Load","Front Load","Automatic","Semi-Automatic"],
+"AC":["Split","Window","Inverter"],
+"AV":["SoundBar","XBoom"]
+};
+
+/* DARK MODE */
+
+function toggleDark(){
+  document.body.classList.toggle("dark");
+}
+
+/* FETCH DATA */
 
 async function fetchData(){
 
 const SHEET_ID="1y87usdTNDTIbCGwvyjaUmwReye_O9J1qEGMm_7YI_BM";
+
 const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
 
 const res=await fetch(url);
@@ -255,6 +265,7 @@ const json=JSON.parse(text.substring(47,text.length-2));
 const rows=json.table.rows;
 
 products=rows.map(r=>({
+
 sku:r.c[0]?.v||"",
 category:r.c[1]?.v||"",
 type:r.c[2]?.v||"",
@@ -263,50 +274,115 @@ rating:r.c[4]?.v?.toString()||"",
 capacity:r.c[5]?.v||"",
 description:r.c[6]?.v||"",
 image:r.c[7]?.v||"",
-stock:r.c[8]?.v?.toString()||"0"
+stock:parseInt(r.c[8]?.v||0),
+location:r.c[9]?.v||""
+
 }));
 
+populateLocations();
+updateTypeOptions();
 filterProducts();
+
 }
 
-function stars(n){
-return "⭐".repeat(parseInt(n)||0);
+/* LOCATION DROPDOWN */
+
+function populateLocations(){
+
+const locations=[...new Set(products.map(p=>p.location).filter(Boolean))];
+
+const select=document.getElementById("locationFilter");
+
+locations.forEach(loc=>{
+  const opt=document.createElement("option");
+  opt.value=loc;
+  opt.textContent=loc;
+  select.appendChild(opt);
+});
+
 }
+
+/* UPDATE TYPE BASED ON CATEGORY */
+
+function updateTypeOptions(){
+
+const category=document.getElementById("categoryFilter").value;
+const typeSelect=document.getElementById("typeFilter");
+
+typeSelect.innerHTML="<option value=''>All Types</option>";
+
+if(typeMap[category]){
+
+typeMap[category].forEach(t=>{
+  const opt=document.createElement("option");
+  opt.value=t;
+  opt.textContent=t;
+  typeSelect.appendChild(opt);
+});
+
+}
+
+}
+
+/* FILTER */
 
 function filterProducts(){
 
-const query=search.value.toUpperCase();
-const category=categoryFilter.value;
-const type=typeFilter.value;
-const rating=ratingFilter.value;
-const stockVal=stockFilter.value;
+const query=document.getElementById("search").value.toUpperCase();
+const category=document.getElementById("categoryFilter").value;
+const type=document.getElementById("typeFilter").value;
+const rating=document.getElementById("ratingFilter").value;
+const stockF=document.getElementById("stockFilter").value;
+const location=document.getElementById("locationFilter").value;
+
+const resultsDiv=document.getElementById("results");
 
 const filtered=products.filter(p=>{
 
-const matchesSearch=p.sku.toUpperCase().includes(query);
-const matchesCategory=!category||p.category===category;
-const matchesType=!type||p.type===type||p.automation===type;
-const matchesRating=!rating||p.rating===rating;
+const matchSearch=p.sku.toUpperCase().includes(query);
+const matchCat=!category||p.category===category;
+const matchType=!type||p.type===type||p.automation===type;
+const matchRating=!rating||p.rating===rating;
+const matchLocation=!location||p.location===location;
 
-let matchesStock=true;
-if(stockVal==="in") matchesStock=parseInt(p.stock)>0;
-if(stockVal==="out") matchesStock=parseInt(p.stock)===0;
+let matchStock=true;
+if(stockF==="in") matchStock=p.stock>0;
+if(stockF==="out") matchStock=p.stock===0;
 
-return matchesSearch&&matchesCategory&&matchesType&&matchesRating&&matchesStock;
+return matchSearch&&matchCat&&matchType&&matchRating&&matchStock&&matchLocation;
 
 });
 
 /* SUMMARY */
-totalCount.innerText=filtered.length;
-inStockCount.innerText=filtered.filter(p=>parseInt(p.stock)>0).length;
-outStockCount.innerText=filtered.filter(p=>parseInt(p.stock)===0).length;
+
+document.getElementById("totalCount").innerText=filtered.length;
+document.getElementById("inStockCount").innerText=filtered.filter(p=>p.stock>0).length;
+document.getElementById("outStockCount").innerText=filtered.filter(p=>p.stock===0).length;
+
+/* LOCATION DASH */
+
+const locTotals={};
+
+filtered.forEach(p=>{
+  if(!locTotals[p.location]) locTotals[p.location]=0;
+  locTotals[p.location]+=p.stock;
+});
+
+const dash=document.getElementById("locationDash");
+
+dash.innerHTML="<b>Stock by Location</b><br>";
+
+for(let loc in locTotals){
+  dash.innerHTML+=`📍 ${loc}: ${locTotals[loc]} units<br>`;
+}
 
 /* RENDER */
-results.innerHTML="";
 
-if(!filtered.length){
-results.innerHTML="<div class='no-result'>No match found</div>";
-return;
+resultsDiv.innerHTML="";
+
+if(filtered.length===0){
+  resultsDiv.innerHTML="<div class='no-result'>No match found</div>";
+  return;
 }
 
 filtered.forEach(p=>{
@@ -314,28 +390,42 @@ filtered.forEach(p=>{
 const div=document.createElement("div");
 div.className="product";
 
-const stockBadge=parseInt(p.stock)>0
-? `<span class="badge in">In Stock (${p.stock})</span>`
-: `<span class="badge out">Out of Stock</span>`;
+const stars="⭐".repeat(parseInt(p.rating||0));
+
+const stockBadge=p.stock>0
+?`<span class="badge in">In Stock (${p.stock})</span>`
+:`<span class="badge out">Out of Stock</span>`;
 
 div.innerHTML=`
+
 ${p.image?`<img src="${p.image}" onclick="openModal('${p.image}')">`:""}
+
 <div class="details">
+
 <div class="sku">${p.sku}</div>
-<div class="small">${p.category} • ${p.type} • ${stars(p.rating)}</div>
+
+<div class="small">${p.category} • ${p.type} • ${stars}</div>
+
 <div class="small">${p.capacity}</div>
-<div class="description">${p.description}</div>
+
+<div>${p.description}</div>
+
+<div class="small">📍 ${p.location}</div>
+
 ${stockBadge}
+
 </div>
+
 `;
 
-results.appendChild(div);
+resultsDiv.appendChild(div);
 
 });
 
 }
 
-/* MODAL */
+/* IMAGE MODAL */
+
 function openModal(src){
 document.getElementById("modalImg").src=src;
 document.getElementById("imgModal").style.display="flex";
@@ -345,21 +435,21 @@ function closeModal(){
 document.getElementById("imgModal").style.display="none";
 }
 
-/* DARK MODE */
-function toggleDark(){
-document.body.classList.toggle("dark");
-}
-
 /* EVENTS */
-search.addEventListener("input",filterProducts);
-categoryFilter.addEventListener("change",filterProducts);
-typeFilter.addEventListener("change",filterProducts);
-ratingFilter.addEventListener("change",filterProducts);
-stockFilter.addEventListener("change",filterProducts);
+
+document.getElementById("categoryFilter").addEventListener("change",()=>{
+updateTypeOptions();
+filterProducts();
+});
+
+document.querySelectorAll("input,select").forEach(el=>{
+el.addEventListener("input",filterProducts);
+el.addEventListener("change",filterProducts);
+});
 
 fetchData();
 
 </script>
-
 </body>
 </html>
+:::
