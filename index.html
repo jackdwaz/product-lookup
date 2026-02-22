@@ -14,29 +14,19 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
   margin: 0;
   background: #f4f6f8;
-  transition: 0.3s;
-}
-
-.dark {
-  background: #121212;
-  color: white;
 }
 
 /* Header */
 .header {
-  background: linear-gradient(135deg, #1e88e5, #42a5f5);
+  background: linear-gradient(135deg, #a50034, #d81b60);
   color: white;
   padding: 18px;
   border-radius: 0 0 18px 18px;
   box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
-.toggle {
-  cursor: pointer;
-  font-size: 18px;
+.header h2 {
+  margin: 0;
 }
 
 /* Container */
@@ -44,53 +34,37 @@ body {
   padding: 15px;
 }
 
-/* Search with icon */
-.searchBox {
-  display: flex;
-  align-items: center;
-  background: white;
-  padding: 10px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-}
-
-.searchBox input {
-  border: none;
-  outline: none;
-  flex: 1;
-  font-size: 14px;
-}
-
-/* Filters */
-select {
+/* Inputs */
+input, select {
   width: 100%;
   padding: 10px;
   margin-bottom: 10px;
   border-radius: 8px;
   border: 1px solid #ddd;
+  font-size: 14px;
   background: white;
 }
 
-/* Dashboard */
-.stats {
+/* Summary */
+.summary {
   display: flex;
   gap: 10px;
   margin-bottom: 12px;
 }
 
-.statCard {
+.summary-card {
   flex: 1;
   background: white;
   border-radius: 10px;
   padding: 10px;
   text-align: center;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-  font-size: 13px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
-.statCard b {
+.summary-card span {
+  display: block;
   font-size: 18px;
+  font-weight: bold;
 }
 
 /* Product Card */
@@ -111,7 +85,6 @@ select {
   object-fit: contain;
   border-radius: 8px;
   background: #fafafa;
-  cursor: pointer;
 }
 
 /* Text */
@@ -122,16 +95,19 @@ select {
 .sku {
   font-weight: bold;
   font-size: 16px;
+  color: #222;
 }
 
 .small {
   font-size: 13px;
   color: #666;
+  margin-top: 2px;
 }
 
 .description {
   font-size: 14px;
   margin-top: 4px;
+  color: #333;
 }
 
 /* Stock Badge */
@@ -154,31 +130,6 @@ select {
   color: #c62828;
 }
 
-/* Stars */
-.stars {
-  color: #ffb400;
-  font-size: 14px;
-}
-
-/* Image popup */
-.popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.85);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.popup img {
-  max-width: 90%;
-  max-height: 90%;
-}
-
 .no-result {
   text-align: center;
   margin-top: 20px;
@@ -192,20 +143,11 @@ select {
 
 <div class="header">
   <h2>LG Product Lookup</h2>
-  <div class="toggle" onclick="toggleDark()">🌙</div>
 </div>
 
 <div class="container">
 
-<div class="searchBox">
-  🔍 <input type="text" id="search" placeholder="Enter full or partial SKU">
-</div>
-
-<div class="stats">
-  <div class="statCard">Total<br><b id="totalCount">0</b></div>
-  <div class="statCard">In Stock<br><b id="inCount">0</b></div>
-  <div class="statCard">Out<br><b id="outCount">0</b></div>
-</div>
+<input type="text" id="search" placeholder="Enter full or partial SKU">
 
 <select id="categoryFilter">
 <option value="">All Categories</option>
@@ -245,36 +187,31 @@ select {
 <option value="out">Out of Stock</option>
 </select>
 
-<div id="results"></div>
+<!-- SUMMARY -->
+<div class="summary">
+  <div class="summary-card">
+    Total Products
+    <span id="totalCount">0</span>
+  </div>
 
+  <div class="summary-card">
+    In Stock
+    <span id="inStockCount">0</span>
+  </div>
+
+  <div class="summary-card">
+    Out of Stock
+    <span id="outStockCount">0</span>
+  </div>
 </div>
 
-<!-- Image Popup -->
-<div class="popup" id="popup" onclick="closePopup()">
-  <img id="popupImg">
+<div id="results"></div>
+
 </div>
 
 <script>
 
 let products = [];
-
-function toggleDark(){
-  document.body.classList.toggle("dark");
-}
-
-function getStars(rating){
-  rating = parseInt(rating) || 0;
-  return "★".repeat(rating) + "☆".repeat(5-rating);
-}
-
-function openPopup(src){
-  document.getElementById("popupImg").src = src;
-  document.getElementById("popup").style.display = "flex";
-}
-
-function closePopup(){
-  document.getElementById("popup").style.display = "none";
-}
 
 async function fetchData() {
 
@@ -300,20 +237,7 @@ image: r.c[7]?.v || "",
 stock: r.c[8]?.v?.toString() || "0"
 }));
 
-updateStats();
 filterProducts();
-
-}
-
-function updateStats(){
-
-const total = products.length;
-const inStock = products.filter(p => parseInt(p.stock) > 0).length;
-const outStock = products.filter(p => parseInt(p.stock) === 0).length;
-
-document.getElementById("totalCount").innerText = total;
-document.getElementById("inCount").innerText = inStock;
-document.getElementById("outCount").innerText = outStock;
 
 }
 
@@ -342,6 +266,18 @@ return matchesSearch && matchesCategory && matchesRating && matchesType && match
 
 });
 
+/* ===== SUMMARY CALCULATION BASED ON FILTERED ===== */
+
+let total = filtered.length;
+let inStock = filtered.filter(p => parseInt(p.stock) > 0).length;
+let outStock = filtered.filter(p => parseInt(p.stock) === 0).length;
+
+document.getElementById("totalCount").innerText = total;
+document.getElementById("inStockCount").innerText = inStock;
+document.getElementById("outStockCount").innerText = outStock;
+
+/* ===== RENDER PRODUCTS ===== */
+
 resultsDiv.innerHTML = "";
 
 if (filtered.length === 0) {
@@ -360,17 +296,15 @@ const stockStatus = parseInt(p.stock) > 0
 
 div.innerHTML = `
 
-${p.image ? `<img src="${p.image}" onclick="openPopup('${p.image}')">` : ""}
+${p.image ? `<img src="${p.image}" alt="${p.sku}">` : ""}
 
 <div class="details">
 
 <div class="sku">${p.sku}</div>
 
 <div class="small">
-${p.category} • ${p.type}
+${p.category} • ${p.type} • ${p.rating}★
 </div>
-
-<div class="stars">${getStars(p.rating)}</div>
 
 <div class="small">${p.capacity}</div>
 
