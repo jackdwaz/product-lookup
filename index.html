@@ -1,39 +1,126 @@
 <!DOCTYPE html>
 <html>
 <head>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Product Lookup</title>
+
 <style>
+
 body {
-font-family: Arial, sans-serif;
-margin: 15px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  margin: 0;
+  background: #f4f6f8;
 }
+
+/* Header */
+.header {
+  background: linear-gradient(135deg, #1e88e5, #42a5f5);
+  color: white;
+  padding: 18px;
+  border-radius: 0 0 18px 18px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+.header h2 {
+  margin: 0;
+}
+
+/* Container */
+.container {
+  padding: 15px;
+}
+
+/* Inputs */
 input, select {
-width: 100%;
-padding: 8px;
-margin-bottom: 8px;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  background: white;
 }
+
+/* Product Card */
 .product {
-border-bottom: 1px solid #ddd;
-padding: 10px 0;
+  background: white;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  display: flex;
+  gap: 12px;
+  align-items: center;
 }
+
 .product img {
-max-width: 120px;
-margin-top: 5px;
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #fafafa;
 }
+
+/* Text */
+.details {
+  flex: 1;
+}
+
 .sku {
-font-weight: bold;
-font-size: 16px;
+  font-weight: bold;
+  font-size: 16px;
+  color: #222;
 }
+
 .small {
-font-size: 14px;
-color: #555;
+  font-size: 13px;
+  color: #666;
+  margin-top: 2px;
 }
+
+.description {
+  font-size: 14px;
+  margin-top: 4px;
+  color: #333;
+}
+
+/* Stock Badge */
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  margin-top: 6px;
+}
+
+.in {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.out {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.no-result {
+  text-align: center;
+  margin-top: 20px;
+  color: #777;
+}
+
 </style>
+
 </head>
 <body>
 
-<h3>Product Lookup</h3>
+<div class="header">
+  <h2>Product Lookup</h2>
+</div>
+
+<div class="container">
 
 <input type="text" id="search" placeholder="Enter full or partial SKU">
 
@@ -69,16 +156,29 @@ color: #555;
 <option value="SoundBar">SoundBar</option>
 </select>
 
+<select id="stockFilter">
+<option value="">All Stock</option>
+<option value="in">In Stock</option>
+<option value="out">Out of Stock</option>
+</select>
+
 <div id="results"></div>
 
+</div>
+
 <script>
+
 let products = [];
 
 async function fetchData() {
-const SHEET_ID = "1y87usdTNDTIbCGwvyjaUmwReye_O9J1qEGMm_7YI_BM";
+
+const SHEET_ID = "1y87usdTNDTIbCGwvyjaUmwReye_O9J1qEGMm_7YI_BM";   // 🔴 CHANGE THIS
+
 const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+
 const response = await fetch(url);
 const text = await response.text();
+
 const json = JSON.parse(text.substring(47, text.length - 2));
 const rows = json.table.rows;
 
@@ -90,57 +190,96 @@ automation: r.c[3]?.v || "",
 rating: r.c[4]?.v?.toString() || "",
 capacity: r.c[5]?.v || "",
 description: r.c[6]?.v || "",
-image: r.c[7]?.v || ""
+image: r.c[7]?.v || "",
+stock: r.c[8]?.v?.toString() || "0"
 }));
 
 filterProducts();
+
 }
 
 function filterProducts() {
+
 const query = document.getElementById("search").value.toUpperCase();
 const category = document.getElementById("categoryFilter").value;
 const rating = document.getElementById("ratingFilter").value;
 const type = document.getElementById("typeFilter").value;
+const stockFilter = document.getElementById("stockFilter").value;
 const resultsDiv = document.getElementById("results");
 
-const filtered = products.filter(p =>
-p.sku.toUpperCase().includes(query) &&
-(category === "" || p.category === category) &&
-(rating === "" || p.rating === rating) &&
-(type === "" || p.type === type || p.automation === type)
-);
+const filtered = products.filter(p => {
+
+const matchesSearch = p.sku.toUpperCase().includes(query);
+const matchesCategory = category === "" || p.category === category;
+const matchesRating = rating === "" || p.rating === rating;
+const matchesType = type === "" || p.type === type || p.automation === type;
+
+let matchesStock = true;
+
+if (stockFilter === "in") {
+matchesStock = parseInt(p.stock) > 0;
+}
+
+if (stockFilter === "out") {
+matchesStock = parseInt(p.stock) === 0;
+}
+
+return matchesSearch && matchesCategory && matchesRating && matchesType && matchesStock;
+
+});
 
 resultsDiv.innerHTML = "";
 
 if (filtered.length === 0) {
-resultsDiv.innerHTML = "<p>No match found</p>";
+resultsDiv.innerHTML = "<div class='no-result'>No match found</div>";
 return;
 }
 
 filtered.forEach(p => {
+
 const div = document.createElement("div");
 div.className = "product";
 
+const stockStatus = parseInt(p.stock) > 0
+? `<span class="badge in">In Stock (${p.stock})</span>`
+: `<span class="badge out">Out of Stock</span>`;
+
 div.innerHTML = `
-<div class="sku">${p.sku}</div>
-<div class="small">
-${p.category} | ${p.type} | ${p.rating} Star
-</div>
-<div class="small">${p.capacity}</div>
-<div>${p.description}</div>
+
 ${p.image ? `<img src="${p.image}" alt="${p.sku}">` : ""}
+
+<div class="details">
+
+<div class="sku">${p.sku}</div>
+
+<div class="small">
+${p.category} • ${p.type} • ${p.rating}★
+</div>
+
+<div class="small">${p.capacity}</div>
+
+<div class="description">${p.description}</div>
+
+${stockStatus}
+
+</div>
+
 `;
 
 resultsDiv.appendChild(div);
+
 });
+
 }
 
 document.getElementById("search").addEventListener("input", filterProducts);
 document.getElementById("categoryFilter").addEventListener("change", filterProducts);
 document.getElementById("ratingFilter").addEventListener("change", filterProducts);
 document.getElementById("typeFilter").addEventListener("change", filterProducts);
+document.getElementById("stockFilter").addEventListener("change", filterProducts);
 
 fetchData();
+
 </script>
 
 </body>
