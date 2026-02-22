@@ -213,18 +213,9 @@ input,select{
 
 <!-- SUMMARY -->
 <div class="summary">
-  <div class="summary-card">
-    Total
-    <span id="totalCount">0</span>
-  </div>
-  <div class="summary-card">
-    In Stock
-    <span id="inStockCount">0</span>
-  </div>
-  <div class="summary-card">
-    Out
-    <span id="outStockCount">0</span>
-  </div>
+  <div class="summary-card">Total<span id="totalCount">0</span></div>
+  <div class="summary-card">In Stock<span id="inStockCount">0</span></div>
+  <div class="summary-card">Out<span id="outStockCount">0</span></div>
 </div>
 
 <div id="results"></div>
@@ -239,6 +230,18 @@ input,select{
 <script>
 
 let products=[];
+
+/* ELEMENTS */
+const search=document.getElementById("search");
+const categoryFilter=document.getElementById("categoryFilter");
+const typeFilter=document.getElementById("typeFilter");
+const ratingFilter=document.getElementById("ratingFilter");
+const stockFilter=document.getElementById("stockFilter");
+
+const totalCount=document.getElementById("totalCount");
+const inStockCount=document.getElementById("inStockCount");
+const outStockCount=document.getElementById("outStockCount");
+const results=document.getElementById("results");
 
 async function fetchData(){
 
@@ -267,7 +270,7 @@ filterProducts();
 }
 
 function stars(n){
-  return "⭐".repeat(parseInt(n)||0);
+return "⭐".repeat(parseInt(n)||0);
 }
 
 function filterProducts(){
@@ -276,7 +279,7 @@ const query=search.value.toUpperCase();
 const category=categoryFilter.value;
 const type=typeFilter.value;
 const rating=ratingFilter.value;
-const stockFilter=stockFilterEl.value;
+const stockVal=stockFilter.value;
 
 const filtered=products.filter(p=>{
 
@@ -286,8 +289,8 @@ const matchesType=!type||p.type===type||p.automation===type;
 const matchesRating=!rating||p.rating===rating;
 
 let matchesStock=true;
-if(stockFilter==="in") matchesStock=parseInt(p.stock)>0;
-if(stockFilter==="out") matchesStock=parseInt(p.stock)===0;
+if(stockVal==="in") matchesStock=parseInt(p.stock)>0;
+if(stockVal==="out") matchesStock=parseInt(p.stock)===0;
 
 return matchesSearch&&matchesCategory&&matchesType&&matchesRating&&matchesStock;
 
@@ -316,9 +319,7 @@ const stockBadge=parseInt(p.stock)>0
 : `<span class="badge out">Out of Stock</span>`;
 
 div.innerHTML=`
-
 ${p.image?`<img src="${p.image}" onclick="openModal('${p.image}')">`:""}
-
 <div class="details">
 <div class="sku">${p.sku}</div>
 <div class="small">${p.category} • ${p.type} • ${stars(p.rating)}</div>
@@ -336,12 +337,12 @@ results.appendChild(div);
 
 /* MODAL */
 function openModal(src){
-modalImg.src=src;
-imgModal.style.display="flex";
+document.getElementById("modalImg").src=src;
+document.getElementById("imgModal").style.display="flex";
 }
 
 function closeModal(){
-imgModal.style.display="none";
+document.getElementById("imgModal").style.display="none";
 }
 
 /* DARK MODE */
@@ -350,13 +351,11 @@ document.body.classList.toggle("dark");
 }
 
 /* EVENTS */
-search.oninput=filterProducts;
-categoryFilter.onchange=filterProducts;
-typeFilter.onchange=filterProducts;
-ratingFilter.onchange=filterProducts;
-stockFilterEl.onchange=filterProducts;
-
-const stockFilterEl=document.getElementById("stockFilter");
+search.addEventListener("input",filterProducts);
+categoryFilter.addEventListener("change",filterProducts);
+typeFilter.addEventListener("change",filterProducts);
+ratingFilter.addEventListener("change",filterProducts);
+stockFilter.addEventListener("change",filterProducts);
 
 fetchData();
 
@@ -364,4 +363,3 @@ fetchData();
 
 </body>
 </html>
-
