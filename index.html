@@ -11,7 +11,7 @@
 <style>
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
   margin: 0;
   background: #f4f6f8;
 }
@@ -22,17 +22,9 @@ body {
   color: white;
   padding: 18px;
   border-radius: 0 0 18px 18px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
 }
 
-.header h2 {
-  margin: 0;
-}
-
-/* Container */
-.container {
-  padding: 15px;
-}
+.container { padding: 15px; }
 
 /* Inputs */
 input, select {
@@ -41,8 +33,6 @@ input, select {
   margin-bottom: 10px;
   border-radius: 8px;
   border: 1px solid #ddd;
-  font-size: 14px;
-  background: white;
 }
 
 /* Summary */
@@ -58,13 +48,27 @@ input, select {
   border-radius: 10px;
   padding: 10px;
   text-align: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
 .summary-card span {
-  display: block;
   font-size: 18px;
   font-weight: bold;
+}
+
+/* Category Dashboard */
+.dashboard {
+  display: flex;
+  overflow-x: auto;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.dash-card {
+  min-width: 140px;
+  background: white;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 13px;
 }
 
 /* Product Card */
@@ -73,7 +77,6 @@ input, select {
   border-radius: 12px;
   padding: 12px;
   margin-bottom: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
   display: flex;
   gap: 12px;
   align-items: center;
@@ -85,30 +88,17 @@ input, select {
   object-fit: contain;
   border-radius: 8px;
   background: #fafafa;
+  cursor: pointer;
 }
 
 /* Text */
-.details {
-  flex: 1;
-}
+.details { flex: 1; }
 
-.sku {
-  font-weight: bold;
-  font-size: 16px;
-  color: #222;
-}
+.sku { font-weight: bold; font-size: 16px; }
 
-.small {
-  font-size: 13px;
-  color: #666;
-  margin-top: 2px;
-}
+.small { font-size: 13px; color: #666; }
 
-.description {
-  font-size: 14px;
-  margin-top: 4px;
-  color: #333;
-}
+.description { font-size: 14px; margin-top: 4px; }
 
 /* Stock Badge */
 .badge {
@@ -120,20 +110,50 @@ input, select {
   margin-top: 6px;
 }
 
-.in {
-  background: #e8f5e9;
-  color: #2e7d32;
+.in { background: #e8f5e9; color: #2e7d32; }
+
+.out { background: #ffebee; color: #c62828; }
+
+.no-result { text-align: center; color: #777; }
+
+/* MODAL */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  background: rgba(0,0,0,0.9);
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
-.out {
-  background: #ffebee;
-  color: #c62828;
+.modal-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1);
+  max-width: 90%;
+  max-height: 80%;
 }
 
-.no-result {
-  text-align: center;
-  margin-top: 20px;
-  color: #777;
+/* Spinner */
+.spinner {
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #d81b60;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -20px;
+  margin-left: -20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg);}
+  100% { transform: rotate(360deg);}
 }
 
 </style>
@@ -161,26 +181,6 @@ input, select {
 <option value="AV">AV</option>
 </select>
 
-<select id="ratingFilter">
-<option value="">All Ratings</option>
-<option value="1">1 Star</option>
-<option value="2">2 Star</option>
-<option value="3">3 Star</option>
-<option value="4">4 Star</option>
-<option value="5">5 Star</option>
-</select>
-
-<select id="typeFilter">
-<option value="">All Types</option>
-<option value="Front Load">Front Load</option>
-<option value="Top Load">Top Load</option>
-<option value="Automatic">Automatic</option>
-<option value="Semi-Automatic">Semi-Automatic</option>
-<option value="Essential">Essential</option>
-<option value="XBoom">XBoom</option>
-<option value="SoundBar">SoundBar</option>
-</select>
-
 <select id="stockFilter">
 <option value="">All Stock</option>
 <option value="in">In Stock</option>
@@ -189,24 +189,22 @@ input, select {
 
 <!-- SUMMARY -->
 <div class="summary">
-  <div class="summary-card">
-    Total Products
-    <span id="totalCount">0</span>
-  </div>
-
-  <div class="summary-card">
-    In Stock
-    <span id="inStockCount">0</span>
-  </div>
-
-  <div class="summary-card">
-    Out of Stock
-    <span id="outStockCount">0</span>
-  </div>
+  <div class="summary-card">Total<span id="totalCount">0</span></div>
+  <div class="summary-card">In Stock<span id="inStockCount">0</span></div>
+  <div class="summary-card">Out<span id="outStockCount">0</span></div>
 </div>
+
+<!-- CATEGORY DASHBOARD -->
+<div id="dashboard" class="dashboard"></div>
 
 <div id="results"></div>
 
+</div>
+
+<!-- IMAGE MODAL -->
+<div id="imgModal" class="modal">
+  <div class="spinner" id="spinner"></div>
+  <img id="modalImg" class="modal-content">
 </div>
 
 <script>
@@ -216,7 +214,6 @@ let products = [];
 async function fetchData() {
 
 const SHEET_ID = "1y87usdTNDTIbCGwvyjaUmwReye_O9J1qEGMm_7YI_BM";
-
 const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
 
 const response = await fetch(url);
@@ -229,7 +226,6 @@ products = rows.map(r => ({
 sku: r.c[0]?.v || "",
 category: r.c[1]?.v || "",
 type: r.c[2]?.v || "",
-automation: r.c[3]?.v || "",
 rating: r.c[4]?.v?.toString() || "",
 capacity: r.c[5]?.v || "",
 description: r.c[6]?.v || "",
@@ -238,15 +234,12 @@ stock: r.c[8]?.v?.toString() || "0"
 }));
 
 filterProducts();
-
 }
 
 function filterProducts() {
 
 const query = document.getElementById("search").value.toUpperCase();
 const category = document.getElementById("categoryFilter").value;
-const rating = document.getElementById("ratingFilter").value;
-const type = document.getElementById("typeFilter").value;
 const stockFilter = document.getElementById("stockFilter").value;
 const resultsDiv = document.getElementById("results");
 
@@ -254,29 +247,53 @@ const filtered = products.filter(p => {
 
 const matchesSearch = p.sku.toUpperCase().includes(query);
 const matchesCategory = category === "" || p.category === category;
-const matchesRating = rating === "" || p.rating === rating;
-const matchesType = type === "" || p.type === type || p.automation === type;
 
 let matchesStock = true;
-
 if (stockFilter === "in") matchesStock = parseInt(p.stock) > 0;
 if (stockFilter === "out") matchesStock = parseInt(p.stock) === 0;
 
-return matchesSearch && matchesCategory && matchesRating && matchesType && matchesStock;
+return matchesSearch && matchesCategory && matchesStock;
 
 });
 
-/* ===== SUMMARY CALCULATION BASED ON FILTERED ===== */
+/* SUMMARY */
 
 let total = filtered.length;
 let inStock = filtered.filter(p => parseInt(p.stock) > 0).length;
 let outStock = filtered.filter(p => parseInt(p.stock) === 0).length;
 
-document.getElementById("totalCount").innerText = total;
-document.getElementById("inStockCount").innerText = inStock;
-document.getElementById("outStockCount").innerText = outStock;
+totalCount.innerText = total;
+inStockCount.innerText = inStock;
+outStockCount.innerText = outStock;
 
-/* ===== RENDER PRODUCTS ===== */
+/* CATEGORY DASHBOARD */
+
+let dashHTML = "";
+let categories = {};
+
+filtered.forEach(p => {
+if (!categories[p.category]) {
+categories[p.category] = {total:0,in:0,out:0};
+}
+categories[p.category].total++;
+if (parseInt(p.stock)>0) categories[p.category].in++;
+else categories[p.category].out++;
+});
+
+for (let cat in categories) {
+let c = categories[cat];
+dashHTML += `
+<div class="dash-card">
+<b>${cat}</b><br>
+Total: ${c.total}<br>
+In: ${c.in}<br>
+Out: ${c.out}
+</div>`;
+}
+
+document.getElementById("dashboard").innerHTML = dashHTML;
+
+/* RENDER */
 
 resultsDiv.innerHTML = "";
 
@@ -296,24 +313,15 @@ const stockStatus = parseInt(p.stock) > 0
 
 div.innerHTML = `
 
-${p.image ? `<img src="${p.image}" alt="${p.sku}">` : ""}
+${p.image ? `<img src="${p.image}" onclick="openModal('${p.image}')">` : ""}
 
 <div class="details">
-
 <div class="sku">${p.sku}</div>
-
-<div class="small">
-${p.category} • ${p.type} • ${p.rating}★
-</div>
-
+<div class="small">${p.category} • ${p.type} • ${p.rating}★</div>
 <div class="small">${p.capacity}</div>
-
 <div class="description">${p.description}</div>
-
 ${stockStatus}
-
 </div>
-
 `;
 
 resultsDiv.appendChild(div);
@@ -322,11 +330,55 @@ resultsDiv.appendChild(div);
 
 }
 
-document.getElementById("search").addEventListener("input", filterProducts);
-document.getElementById("categoryFilter").addEventListener("change", filterProducts);
-document.getElementById("ratingFilter").addEventListener("change", filterProducts);
-document.getElementById("typeFilter").addEventListener("change", filterProducts);
-document.getElementById("stockFilter").addEventListener("change", filterProducts);
+/* IMAGE MODAL WITH PINCH + SWIPE */
+
+let modal = document.getElementById("imgModal");
+let modalImg = document.getElementById("modalImg");
+let spinner = document.getElementById("spinner");
+
+let scale = 1;
+let startY = 0;
+
+function openModal(src) {
+modal.style.display = "block";
+spinner.style.display = "block";
+modalImg.style.transform = "translate(-50%, -50%) scale(1)";
+scale = 1;
+
+modalImg.onload = () => spinner.style.display = "none";
+modalImg.src = src;
+}
+
+modal.onclick = () => modal.style.display = "none";
+
+/* Pinch Zoom */
+
+modalImg.addEventListener("wheel", e => {
+e.preventDefault();
+scale += e.deltaY * -0.001;
+scale = Math.min(Math.max(.5, scale), 4);
+modalImg.style.transform =
+`translate(-50%, -50%) scale(${scale})`;
+});
+
+/* Swipe Down Close */
+
+modalImg.addEventListener("touchstart", e => {
+startY = e.touches[0].clientY;
+});
+
+modalImg.addEventListener("touchmove", e => {
+let moveY = e.touches[0].clientY;
+if (moveY - startY > 120) {
+modal.style.display = "none";
+}
+});
+
+/* EVENTS */
+
+search.addEventListener("input", filterProducts);
+categoryFilter.addEventListener("change", filterProducts);
+stockFilter.addEventListener("change", filterProducts);
 
 fetchData();
 
