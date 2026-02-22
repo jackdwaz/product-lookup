@@ -4,19 +4,22 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LG Product Lookup</title>
-  
+
 <link rel="icon" type="image/svg+xml" href="https://upload.wikimedia.org/wikipedia/commons/2/20/LG_symbol.svg">
 <link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/commons/2/20/LG_symbol.svg">
 
-  
-</head>
-  
-  <style>
+<style>
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
   margin: 0;
   background: #f4f6f8;
+  transition: 0.3s;
+}
+
+.dark {
+  background: #121212;
+  color: white;
 }
 
 /* Header */
@@ -26,10 +29,14 @@ body {
   padding: 18px;
   border-radius: 0 0 18px 18px;
   box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.header h2 {
-  margin: 0;
+.toggle {
+  cursor: pointer;
+  font-size: 18px;
 }
 
 /* Container */
@@ -37,15 +44,53 @@ body {
   padding: 15px;
 }
 
-/* Inputs */
-input, select {
+/* Search with icon */
+.searchBox {
+  display: flex;
+  align-items: center;
+  background: white;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+}
+
+.searchBox input {
+  border: none;
+  outline: none;
+  flex: 1;
+  font-size: 14px;
+}
+
+/* Filters */
+select {
   width: 100%;
   padding: 10px;
   margin-bottom: 10px;
   border-radius: 8px;
   border: 1px solid #ddd;
-  font-size: 14px;
   background: white;
+}
+
+/* Dashboard */
+.stats {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.statCard {
+  flex: 1;
+  background: white;
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+  font-size: 13px;
+}
+
+.statCard b {
+  font-size: 18px;
 }
 
 /* Product Card */
@@ -66,6 +111,7 @@ input, select {
   object-fit: contain;
   border-radius: 8px;
   background: #fafafa;
+  cursor: pointer;
 }
 
 /* Text */
@@ -76,19 +122,16 @@ input, select {
 .sku {
   font-weight: bold;
   font-size: 16px;
-  color: #222;
 }
 
 .small {
   font-size: 13px;
   color: #666;
-  margin-top: 2px;
 }
 
 .description {
   font-size: 14px;
   margin-top: 4px;
-  color: #333;
 }
 
 /* Stock Badge */
@@ -111,6 +154,31 @@ input, select {
   color: #c62828;
 }
 
+/* Stars */
+.stars {
+  color: #ffb400;
+  font-size: 14px;
+}
+
+/* Image popup */
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.85);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup img {
+  max-width: 90%;
+  max-height: 90%;
+}
+
 .no-result {
   text-align: center;
   margin-top: 20px;
@@ -124,11 +192,20 @@ input, select {
 
 <div class="header">
   <h2>LG Product Lookup</h2>
+  <div class="toggle" onclick="toggleDark()">🌙</div>
 </div>
 
 <div class="container">
 
-<input type="text" id="search" placeholder="Enter full or partial SKU">
+<div class="searchBox">
+  🔍 <input type="text" id="search" placeholder="Enter full or partial SKU">
+</div>
+
+<div class="stats">
+  <div class="statCard">Total<br><b id="totalCount">0</b></div>
+  <div class="statCard">In Stock<br><b id="inCount">0</b></div>
+  <div class="statCard">Out<br><b id="outCount">0</b></div>
+</div>
 
 <select id="categoryFilter">
 <option value="">All Categories</option>
@@ -172,13 +249,36 @@ input, select {
 
 </div>
 
+<!-- Image Popup -->
+<div class="popup" id="popup" onclick="closePopup()">
+  <img id="popupImg">
+</div>
+
 <script>
 
 let products = [];
 
+function toggleDark(){
+  document.body.classList.toggle("dark");
+}
+
+function getStars(rating){
+  rating = parseInt(rating) || 0;
+  return "★".repeat(rating) + "☆".repeat(5-rating);
+}
+
+function openPopup(src){
+  document.getElementById("popupImg").src = src;
+  document.getElementById("popup").style.display = "flex";
+}
+
+function closePopup(){
+  document.getElementById("popup").style.display = "none";
+}
+
 async function fetchData() {
 
-const SHEET_ID = "1y87usdTNDTIbCGwvyjaUmwReye_O9J1qEGMm_7YI_BM";   // 🔴 CHANGE THIS
+const SHEET_ID = "1y87usdTNDTIbCGwvyjaUmwReye_O9J1qEGMm_7YI_BM";
 
 const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
 
@@ -200,7 +300,20 @@ image: r.c[7]?.v || "",
 stock: r.c[8]?.v?.toString() || "0"
 }));
 
+updateStats();
 filterProducts();
+
+}
+
+function updateStats(){
+
+const total = products.length;
+const inStock = products.filter(p => parseInt(p.stock) > 0).length;
+const outStock = products.filter(p => parseInt(p.stock) === 0).length;
+
+document.getElementById("totalCount").innerText = total;
+document.getElementById("inCount").innerText = inStock;
+document.getElementById("outCount").innerText = outStock;
 
 }
 
@@ -222,13 +335,8 @@ const matchesType = type === "" || p.type === type || p.automation === type;
 
 let matchesStock = true;
 
-if (stockFilter === "in") {
-matchesStock = parseInt(p.stock) > 0;
-}
-
-if (stockFilter === "out") {
-matchesStock = parseInt(p.stock) === 0;
-}
+if (stockFilter === "in") matchesStock = parseInt(p.stock) > 0;
+if (stockFilter === "out") matchesStock = parseInt(p.stock) === 0;
 
 return matchesSearch && matchesCategory && matchesRating && matchesType && matchesStock;
 
@@ -252,15 +360,17 @@ const stockStatus = parseInt(p.stock) > 0
 
 div.innerHTML = `
 
-${p.image ? `<img src="${p.image}" alt="${p.sku}">` : ""}
+${p.image ? `<img src="${p.image}" onclick="openPopup('${p.image}')">` : ""}
 
 <div class="details">
 
 <div class="sku">${p.sku}</div>
 
 <div class="small">
-${p.category} • ${p.type} • ${p.rating}★
+${p.category} • ${p.type}
 </div>
+
+<div class="stars">${getStars(p.rating)}</div>
 
 <div class="small">${p.capacity}</div>
 
@@ -290,6 +400,3 @@ fetchData();
 
 </body>
 </html>
-
-
-
