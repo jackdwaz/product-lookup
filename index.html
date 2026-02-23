@@ -22,7 +22,7 @@ body.dark{
 
 body{
   margin:0;
-  font-family:-apple-system, BlinkMacSystemFont,"Segoe UI",Roboto,Arial;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial;
   background:var(--bg);
   color:var(--text);
 }
@@ -104,18 +104,6 @@ input,select{
 .sku{ font-weight:bold; font-size:16px; }
 .small{ font-size:13px; color:var(--sub); }
 
-.badge{
-  display:inline-block;
-  padding:4px 10px;
-  border-radius:20px;
-  font-size:12px;
-  font-weight:bold;
-  margin-top:5px;
-}
-
-.in{background:#e8f5e9;color:#2e7d32;}
-.out{background:#ffebee;color:#c62828;}
-
 .no-result{ text-align:center; margin-top:20px; }
 
 .modal{
@@ -188,12 +176,25 @@ input,select{
 
 <select id="locationFilter">
 <option value="">All Locations</option>
-<option>BH+OR</option>
-<option>PAT</option>
-<option>RAN</option>
-<option>LUC</option>
-<option>ROUP</option>
-<option>VAR</option>
+<option>Azamgarh</option>
+<option>Bhadohi</option>
+<option>Deoria</option>
+<option>Ghazipur</option>
+<option>Jaunpur</option>
+<option>Kushinagar</option>
+<option>Mau</option>
+<option>Mirzapur</option>
+<option>Mughalsarai</option>
+<option>Prayagraj</option>
+<option>Gilat Bazar</option>
+<option>Medical Road</option>
+<option>Kareli</option>
+<option>Ravindrapuri</option>
+<option>Pandeypur</option>
+<option>Ramnagar</option>
+<option>SUNDERPUR</option>
+<option>Saulemasarai</option>
+<option>LUXA</option>
 </select>
 
 <div class="summary">
@@ -215,7 +216,13 @@ input,select{
 <script>
 
 let products=[];
-const LOCATIONS=["BH+OR","PAT","RAN","LUC","ROUP","VAR"];
+
+const LOCATIONS=[
+"Azamgarh","Bhadohi","Deoria","Ghazipur","Jaunpur",
+"Kushinagar","Mau","Mirzapur","Mughalsarai","Prayagraj",
+"Gilat Bazar","Medical Road","Kareli","Ravindrapuri",
+"Pandeypur","Ramnagar","SUNDERPUR","Saulemasarai","LUXA"
+];
 
 const typeMap={
 "TV":["HD Ready","FHD","UHD","OLED","NanoCell"],
@@ -230,7 +237,7 @@ function toggleDark(){
 
 async function fetchData(){
 
-const SHEET_ID="1y87usdTNDTIbCGwvyjaUmwReye_O9J1qEGMm_7YI_BM";
+const SHEET_ID="YOUR_SHEET_ID_HERE";
 const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
 
 const res=await fetch(url);
@@ -247,12 +254,25 @@ rating:r.c[4]?.v?.toString()||"",
 capacity:r.c[5]?.v||"",
 description:r.c[6]?.v||"",
 image:r.c[7]?.v||"",
-"BH+OR":parseInt(r.c[8]?.v||0),
-PAT:parseInt(r.c[9]?.v||0),
-RAN:parseInt(r.c[10]?.v||0),
-LUC:parseInt(r.c[11]?.v||0),
-ROUP:parseInt(r.c[12]?.v||0),
-VAR:parseInt(r.c[13]?.v||0)
+Azamgarh:parseInt(r.c[8]?.v||0),
+Bhadohi:parseInt(r.c[9]?.v||0),
+Deoria:parseInt(r.c[10]?.v||0),
+Ghazipur:parseInt(r.c[11]?.v||0),
+Jaunpur:parseInt(r.c[12]?.v||0),
+Kushinagar:parseInt(r.c[13]?.v||0),
+Mau:parseInt(r.c[14]?.v||0),
+Mirzapur:parseInt(r.c[15]?.v||0),
+Mughalsarai:parseInt(r.c[16]?.v||0),
+Prayagraj:parseInt(r.c[17]?.v||0),
+"Gilat Bazar":parseInt(r.c[18]?.v||0),
+"Medical Road":parseInt(r.c[19]?.v||0),
+Kareli:parseInt(r.c[20]?.v||0),
+Ravindrapuri:parseInt(r.c[21]?.v||0),
+Pandeypur:parseInt(r.c[22]?.v||0),
+Ramnagar:parseInt(r.c[23]?.v||0),
+SUNDERPUR:parseInt(r.c[24]?.v||0),
+Saulemasarai:parseInt(r.c[25]?.v||0),
+LUXA:parseInt(r.c[26]?.v||0)
 }));
 
 updateTypeOptions();
@@ -264,51 +284,47 @@ return LOCATIONS.reduce((sum,loc)=>sum+p[loc],0);
 }
 
 function updateTypeOptions(){
-const category=categoryFilter.value;
 typeFilter.innerHTML="<option value=''>All Types</option>";
-if(typeMap[category]){
-typeMap[category].forEach(t=>{
-  const opt=document.createElement("option");
-  opt.value=t;
-  opt.textContent=t;
-  typeFilter.appendChild(opt);
+if(typeMap[categoryFilter.value]){
+typeMap[categoryFilter.value].forEach(t=>{
+let opt=document.createElement("option");
+opt.value=t;
+opt.textContent=t;
+typeFilter.appendChild(opt);
 });
 }
 }
 
 function filterProducts(){
 
-const query=search.value.toUpperCase();
-const category=categoryFilter.value;
-const type=typeFilter.value;
-const rating=ratingFilter.value;
-const stockF=stockFilter.value;
-const location=locationFilter.value;
+let query=search.value.toUpperCase();
+let category=categoryFilter.value;
+let type=typeFilter.value;
+let rating=ratingFilter.value;
+let stockF=stockFilter.value;
+let location=locationFilter.value;
 
 let filtered=products.filter(p=>{
 
-const matchSearch=p.sku.toUpperCase().includes(query);
-const matchCat=!category||p.category===category;
-const matchType=!type||p.type===type||p.automation===type;
-const matchRating=!rating||p.rating===rating;
+let matchSearch=p.sku.toUpperCase().includes(query);
+let matchCat=!category||p.category===category;
+let matchType=!type||p.type===type||p.automation===type;
+let matchRating=!rating||p.rating===rating;
+
+let matchLocation=!location||p[location]>0;
 
 let matchStock=true;
-if(stockF==="in") matchStock=location ? p[location]>0 : totalStock(p)>0;
-if(stockF==="out") matchStock=location ? p[location]===0 : totalStock(p)===0;
+if(stockF==="in") matchStock=location?p[location]>0:totalStock(p)>0;
+if(stockF==="out") matchStock=location?p[location]===0:totalStock(p)===0;
 
-let matchLocation=true;
-if(location) matchLocation=p[location]>0;
-
-return matchSearch&&matchCat&&matchType&&matchRating&&matchStock&&matchLocation;
-
+return matchSearch&&matchCat&&matchType&&matchRating&&matchLocation&&matchStock;
 });
 
 totalCount.innerText=filtered.length;
-inStockCount.innerText=filtered.filter(p=>location ? p[location]>0 : totalStock(p)>0).length;
-outStockCount.innerText=filtered.filter(p=>location ? p[location]===0 : totalStock(p)===0).length;
+inStockCount.innerText=filtered.filter(p=>location?p[location]>0:totalStock(p)>0).length;
+outStockCount.innerText=filtered.filter(p=>location?p[location]===0:totalStock(p)===0).length;
 
 let dashHTML="<b>Stock by Location</b><br>";
-
 if(location){
 let totalLoc=filtered.reduce((sum,p)=>sum+p[location],0);
 dashHTML+=`${location}: ${totalLoc} units`;
@@ -318,23 +334,20 @@ let totalLoc=filtered.reduce((sum,p)=>sum+p[loc],0);
 dashHTML+=`${loc}: ${totalLoc} units<br>`;
 });
 }
-
 locationDash.innerHTML=dashHTML;
 
 results.innerHTML="";
-
 if(filtered.length===0){
 results.innerHTML="<div class='no-result'>No match found</div>";
 return;
 }
 
 filtered.forEach(p=>{
-
 let locText=location
 ? `${location}: ${p[location]}`
 : LOCATIONS.map(loc=>`${loc}:${p[loc]}`).join(" | ");
 
-const stars="⭐".repeat(parseInt(p.rating||0));
+let stars="⭐".repeat(parseInt(p.rating||0));
 
 results.innerHTML+=`
 <div class="product">
@@ -347,9 +360,7 @@ ${p.image?`<img src="${p.image}" onclick="openModal('${p.image}')">`:""}
 </div>
 </div>
 `;
-
 });
-
 }
 
 function openModal(src){
@@ -371,10 +382,5 @@ categoryFilter.addEventListener("change",updateTypeOptions);
 fetchData();
 
 </script>
-
 </body>
 </html>
-
-
-
-
