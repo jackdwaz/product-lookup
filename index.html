@@ -4,8 +4,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LG Product Lookup</title>
 <link rel="icon" type="image/svg+xml" href="https://upload.wikimedia.org/wikipedia/commons/2/20/LG_symbol.svg">
-<style>
 
+<style>
 :root{
   --bg:#f4f6f8;
   --card:#ffffff;
@@ -22,12 +22,10 @@ body.dark{
 
 body{
   margin:0;
-  font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
+  font-family:-apple-system, BlinkMacSystemFont,"Segoe UI",Roboto,Arial;
   background:var(--bg);
   color:var(--text);
 }
-
-/* HEADER */
 
 .header{
   background:linear-gradient(135deg,#a50034,#d81b60);
@@ -45,14 +43,9 @@ body{
   padding:6px 10px;
   border-radius:6px;
   cursor:pointer;
-  font-size:12px;
 }
 
-/* CONTAINER */
-
-.container{
-  padding:15px;
-}
+.container{ padding:15px; }
 
 input,select{
   width:100%;
@@ -63,8 +56,6 @@ input,select{
   background:var(--card);
   color:var(--text);
 }
-
-/* DASHBOARD */
 
 .summary{
   display:flex;
@@ -82,14 +73,6 @@ input,select{
   box-shadow:0 4px 10px rgba(0,0,0,0.15);
 }
 
-.summary-card span{
-  display:block;
-  font-size:18px;
-  font-weight:bold;
-}
-
-/* LOCATION DASH */
-
 .locationDash{
   background:var(--card);
   border-radius:10px;
@@ -97,8 +80,6 @@ input,select{
   margin-bottom:12px;
   box-shadow:0 4px 10px rgba(0,0,0,0.15);
 }
-
-/* PRODUCT CARD */
 
 .product{
   background:var(--card);
@@ -119,23 +100,13 @@ input,select{
   cursor:pointer;
 }
 
-.details{
-  flex:1;
-}
-
-.sku{
-  font-weight:bold;
-  font-size:16px;
-}
-
-.small{
-  font-size:13px;
-  color:var(--sub);
-}
+.details{ flex:1; }
+.sku{ font-weight:bold; font-size:16px; }
+.small{ font-size:13px; color:var(--sub); }
 
 .badge{
   display:inline-block;
-  padding:3px 10px;
+  padding:4px 10px;
   border-radius:20px;
   font-size:12px;
   font-weight:bold;
@@ -145,21 +116,12 @@ input,select{
 .in{background:#e8f5e9;color:#2e7d32;}
 .out{background:#ffebee;color:#c62828;}
 
-.no-result{
-  text-align:center;
-  margin-top:20px;
-}
-
-/* IMAGE MODAL */
+.no-result{ text-align:center; margin-top:20px; }
 
 .modal{
   display:none;
   position:fixed;
-  z-index:999;
-  left:0;
-  top:0;
-  width:100%;
-  height:100%;
+  inset:0;
   background:rgba(0,0,0,0.9);
   justify-content:center;
   align-items:center;
@@ -179,16 +141,20 @@ input,select{
   font-size:30px;
   cursor:pointer;
 }
-
 </style>
 </head>
+
 <body>
+
 <div class="header">
   <h2>LG Product Lookup</h2>
   <button class="toggle" onclick="toggleDark()">🌙 Dark</button>
 </div>
+
 <div class="container">
+
 <input type="text" id="search" placeholder="Enter SKU">
+
 <select id="categoryFilter">
 <option value="">All Categories</option>
 <option>Washing Machine</option>
@@ -200,9 +166,11 @@ input,select{
 <option>Refrigerator</option>
 <option>AV</option>
 </select>
+
 <select id="typeFilter">
 <option value="">All Types</option>
 </select>
+
 <select id="ratingFilter">
 <option value="">All Ratings</option>
 <option value="1">⭐</option>
@@ -211,31 +179,43 @@ input,select{
 <option value="4">⭐⭐⭐⭐</option>
 <option value="5">⭐⭐⭐⭐⭐</option>
 </select>
+
 <select id="stockFilter">
 <option value="">All Stock</option>
 <option value="in">In Stock</option>
 <option value="out">Out of Stock</option>
 </select>
+
 <select id="locationFilter">
 <option value="">All Locations</option>
+<option>BH</option>
+<option>PAT</option>
+<option>RAN</option>
+<option>LUC</option>
+<option>ROUP</option>
+<option>VAR</option>
 </select>
+
 <div class="summary">
-  <div class="summary-card">Total Models <span id="totalCount">0</span></div>
-  <div class="summary-card">In Stock <span id="inStockCount">0</span></div>
-  <div class="summary-card">Out Stock <span id="outStockCount">0</span></div>
+  <div class="summary-card">Total Models <br><b id="totalCount">0</b></div>
+  <div class="summary-card">In Stock <br><b id="inStockCount">0</b></div>
+  <div class="summary-card">Out Stock <br><b id="outStockCount">0</b></div>
 </div>
+
 <div class="locationDash" id="locationDash"></div>
 <div id="results"></div>
+
 </div>
+
 <div class="modal" id="imgModal">
   <span class="close" onclick="closeModal()">×</span>
   <img id="modalImg">
 </div>
+
 <script>
 
 let products=[];
-
-/* CATEGORY → TYPE MAP */
+const LOCATIONS=["BH","PAT","RAN","LUC","ROUP","VAR"];
 
 const typeMap={
 "TV":["HD Ready","FHD","UHD","OLED","NanoCell"],
@@ -244,28 +224,21 @@ const typeMap={
 "AV":["SoundBar","XBoom"]
 };
 
-/* DARK MODE */
-
 function toggleDark(){
   document.body.classList.toggle("dark");
 }
 
-/* FETCH DATA */
-
 async function fetchData(){
 
 const SHEET_ID="1y87usdTNDTIbCGwvyjaUmwReye_O9J1qEGMm_7YI_BM";
-
 const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
 
 const res=await fetch(url);
 const text=await res.text();
-
 const json=JSON.parse(text.substring(47,text.length-2));
 const rows=json.table.rows;
 
 products=rows.map(r=>({
-
 sku:r.c[0]?.v||"",
 category:r.c[1]?.v||"",
 type:r.c[2]?.v||"",
@@ -274,182 +247,130 @@ rating:r.c[4]?.v?.toString()||"",
 capacity:r.c[5]?.v||"",
 description:r.c[6]?.v||"",
 image:r.c[7]?.v||"",
-stock:parseInt(r.c[8]?.v||0),
-location:r.c[9]?.v||""
-
+BH:parseInt(r.c[8]?.v||0),
+PAT:parseInt(r.c[9]?.v||0),
+RAN:parseInt(r.c[10]?.v||0),
+LUC:parseInt(r.c[11]?.v||0),
+ROUP:parseInt(r.c[12]?.v||0),
+VAR:parseInt(r.c[13]?.v||0)
 }));
 
-populateLocations();
 updateTypeOptions();
 filterProducts();
-
 }
 
-/* LOCATION DROPDOWN */
-
-function populateLocations(){
-
-const locations=[...new Set(products.map(p=>p.location).filter(Boolean))];
-
-const select=document.getElementById("locationFilter");
-
-locations.forEach(loc=>{
-  const opt=document.createElement("option");
-  opt.value=loc;
-  opt.textContent=loc;
-  select.appendChild(opt);
-});
-
+function totalStock(p){
+return LOCATIONS.reduce((sum,loc)=>sum+p[loc],0);
 }
-
-/* UPDATE TYPE BASED ON CATEGORY */
 
 function updateTypeOptions(){
-
-const category=document.getElementById("categoryFilter").value;
-const typeSelect=document.getElementById("typeFilter");
-
-typeSelect.innerHTML="<option value=''>All Types</option>";
-
+const category=categoryFilter.value;
+typeFilter.innerHTML="<option value=''>All Types</option>";
 if(typeMap[category]){
-
 typeMap[category].forEach(t=>{
   const opt=document.createElement("option");
   opt.value=t;
   opt.textContent=t;
-  typeSelect.appendChild(opt);
+  typeFilter.appendChild(opt);
 });
-
 }
-
 }
-
-/* FILTER */
 
 function filterProducts(){
 
-const query=document.getElementById("search").value.toUpperCase();
-const category=document.getElementById("categoryFilter").value;
-const type=document.getElementById("typeFilter").value;
-const rating=document.getElementById("ratingFilter").value;
-const stockF=document.getElementById("stockFilter").value;
-const location=document.getElementById("locationFilter").value;
+const query=search.value.toUpperCase();
+const category=categoryFilter.value;
+const type=typeFilter.value;
+const rating=ratingFilter.value;
+const stockF=stockFilter.value;
+const location=locationFilter.value;
 
-const resultsDiv=document.getElementById("results");
-
-const filtered=products.filter(p=>{
+let filtered=products.filter(p=>{
 
 const matchSearch=p.sku.toUpperCase().includes(query);
 const matchCat=!category||p.category===category;
 const matchType=!type||p.type===type||p.automation===type;
 const matchRating=!rating||p.rating===rating;
-const matchLocation=!location||p.location===location;
 
 let matchStock=true;
-if(stockF==="in") matchStock=p.stock>0;
-if(stockF==="out") matchStock=p.stock===0;
+if(stockF==="in") matchStock=location ? p[location]>0 : totalStock(p)>0;
+if(stockF==="out") matchStock=location ? p[location]===0 : totalStock(p)===0;
+
+let matchLocation=true;
+if(location) matchLocation=p[location]>0;
 
 return matchSearch&&matchCat&&matchType&&matchRating&&matchStock&&matchLocation;
 
 });
 
-/* SUMMARY */
+totalCount.innerText=filtered.length;
+inStockCount.innerText=filtered.filter(p=>location ? p[location]>0 : totalStock(p)>0).length;
+outStockCount.innerText=filtered.filter(p=>location ? p[location]===0 : totalStock(p)===0).length;
 
-document.getElementById("totalCount").innerText=filtered.length;
-document.getElementById("inStockCount").innerText=filtered.filter(p=>p.stock>0).length;
-document.getElementById("outStockCount").innerText=filtered.filter(p=>p.stock===0).length;
+let dashHTML="<b>Stock by Location</b><br>";
 
-/* LOCATION DASH */
-
-const locTotals={};
-
-filtered.forEach(p=>{
-  if(!locTotals[p.location]) locTotals[p.location]=0;
-  locTotals[p.location]+=p.stock;
+if(location){
+let totalLoc=filtered.reduce((sum,p)=>sum+p[location],0);
+dashHTML+=`${location}: ${totalLoc} units`;
+}else{
+LOCATIONS.forEach(loc=>{
+let totalLoc=filtered.reduce((sum,p)=>sum+p[loc],0);
+dashHTML+=`${loc}: ${totalLoc} units<br>`;
 });
-
-const dash=document.getElementById("locationDash");
-
-dash.innerHTML="<b>Stock by Location</b><br>";
-
-for(let loc in locTotals){
-  dash.innerHTML+=`📍 ${loc}: ${locTotals[loc]} units<br>`;
 }
 
-/* RENDER */
+locationDash.innerHTML=dashHTML;
 
-resultsDiv.innerHTML="";
+results.innerHTML="";
 
 if(filtered.length===0){
-  resultsDiv.innerHTML="<div class='no-result'>No match found</div>";
-  return;
+results.innerHTML="<div class='no-result'>No match found</div>";
+return;
 }
 
 filtered.forEach(p=>{
 
-const div=document.createElement("div");
-div.className="product";
+let locText=location
+? `${location}: ${p[location]}`
+: LOCATIONS.map(loc=>`${loc}:${p[loc]}`).join(" | ");
 
 const stars="⭐".repeat(parseInt(p.rating||0));
 
-const stockBadge=p.stock>0
-?`<span class="badge in">In Stock (${p.stock})</span>`
-:`<span class="badge out">Out of Stock</span>`;
-
-div.innerHTML=`
-
+results.innerHTML+=`
+<div class="product">
 ${p.image?`<img src="${p.image}" onclick="openModal('${p.image}')">`:""}
-
 <div class="details">
-
 <div class="sku">${p.sku}</div>
-
 <div class="small">${p.category} • ${p.type} • ${stars}</div>
-
-<div class="small">${p.capacity}</div>
-
-<div>${p.description}</div>
-
-<div class="small">📍 ${p.location}</div>
-
-${stockBadge}
-
+<div class="small">${locText}</div>
+<div class="small"><b>Total: ${totalStock(p)}</b></div>
 </div>
-
+</div>
 `;
-
-resultsDiv.appendChild(div);
 
 });
 
 }
 
-/* IMAGE MODAL */
-
 function openModal(src){
-document.getElementById("modalImg").src=src;
-document.getElementById("imgModal").style.display="flex";
+modalImg.src=src;
+imgModal.style.display="flex";
 }
 
 function closeModal(){
-document.getElementById("imgModal").style.display="none";
+imgModal.style.display="none";
 }
-
-/* EVENTS */
-
-document.getElementById("categoryFilter").addEventListener("change",()=>{
-updateTypeOptions();
-filterProducts();
-});
 
 document.querySelectorAll("input,select").forEach(el=>{
 el.addEventListener("input",filterProducts);
 el.addEventListener("change",filterProducts);
 });
 
+categoryFilter.addEventListener("change",updateTypeOptions);
+
 fetchData();
 
 </script>
+
 </body>
 </html>
-:::
