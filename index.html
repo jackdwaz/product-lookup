@@ -12,21 +12,18 @@
   --text:#222;
   --sub:#666;
 }
-
 body.dark{
   --bg:#121212;
   --card:#1e1e1e;
   --text:#f5f5f5;
   --sub:#bbbbbb;
 }
-
 body{
   margin:0;
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial;
   background:var(--bg);
   color:var(--text);
 }
-
 .header{
   background:linear-gradient(135deg,#a50034,#d81b60);
   color:white;
@@ -36,7 +33,6 @@ body{
   justify-content:space-between;
   align-items:center;
 }
-
 .toggle{
   background:white;
   border:none;
@@ -44,9 +40,7 @@ body{
   border-radius:6px;
   cursor:pointer;
 }
-
 .container{ padding:15px; }
-
 input,select{
   width:100%;
   padding:10px;
@@ -56,14 +50,12 @@ input,select{
   background:var(--card);
   color:var(--text);
 }
-
 .summary{
   display:flex;
   gap:10px;
   margin-bottom:12px;
   flex-wrap:wrap;
 }
-
 .summary-card{
   flex:1;
   background:var(--card);
@@ -72,7 +64,6 @@ input,select{
   text-align:center;
   box-shadow:0 4px 10px rgba(0,0,0,0.15);
 }
-
 .locationDash{
   background:var(--card);
   border-radius:10px;
@@ -80,7 +71,6 @@ input,select{
   margin-bottom:12px;
   box-shadow:0 4px 10px rgba(0,0,0,0.15);
 }
-
 .product{
   background:var(--card);
   border-radius:12px;
@@ -91,7 +81,6 @@ input,select{
   align-items:center;
   box-shadow:0 6px 14px rgba(0,0,0,0.15);
 }
-
 .product img{
   width:90px;
   height:90px;
@@ -99,11 +88,9 @@ input,select{
   border-radius:8px;
   cursor:pointer;
 }
-
 .details{ flex:1; }
 .sku{ font-weight:bold; font-size:16px; }
 .small{ font-size:13px; color:var(--sub); }
-
 .no-result{ text-align:center; margin-top:20px; }
 
 .modal{
@@ -114,13 +101,11 @@ input,select{
   justify-content:center;
   align-items:center;
 }
-
 .modal img{
   max-width:95%;
   max-height:95%;
   border-radius:10px;
 }
-
 .close{
   position:absolute;
   top:20px;
@@ -305,12 +290,10 @@ let stockF=stockFilter.value;
 let location=locationFilter.value;
 
 let filtered=products.filter(p=>{
-
 let matchSearch=p.sku.toUpperCase().includes(query);
 let matchCat=!category||p.category===category;
 let matchType=!type||p.type===type||p.automation===type;
 let matchRating=!rating||p.rating===rating;
-
 let matchLocation=!location||p[location]>0;
 
 let matchStock=true;
@@ -325,13 +308,14 @@ inStockCount.innerText=filtered.filter(p=>location?p[location]>0:totalStock(p)>0
 outStockCount.innerText=filtered.filter(p=>location?p[location]===0:totalStock(p)===0).length;
 
 let dashHTML="<b>Stock by Location</b><br>";
+
 if(location){
 let totalLoc=filtered.reduce((sum,p)=>sum+p[location],0);
-dashHTML+=`${location}: ${totalLoc} units`;
+if(totalLoc>0) dashHTML+=`${location}: ${totalLoc} units`;
 }else{
 LOCATIONS.forEach(loc=>{
 let totalLoc=filtered.reduce((sum,p)=>sum+p[loc],0);
-dashHTML+=`${loc}: ${totalLoc} units<br>`;
+if(totalLoc>0) dashHTML+=`${loc}: ${totalLoc} units<br>`;
 });
 }
 locationDash.innerHTML=dashHTML;
@@ -343,9 +327,14 @@ return;
 }
 
 filtered.forEach(p=>{
+
+let activeLocations=LOCATIONS
+.filter(loc=>p[loc]>0)
+.map(loc=>`${loc}: ${p[loc]}`);
+
 let locText=location
 ? `${location}: ${p[location]}`
-: LOCATIONS.map(loc=>`${loc}:${p[loc]}`).join(" | ");
+: activeLocations.join(" | ");
 
 let stars="⭐".repeat(parseInt(p.rating||0));
 
@@ -361,13 +350,13 @@ ${p.image?`<img src="${p.image}" onclick="openModal('${p.image}')">`:""}
 </div>
 `;
 });
+
 }
 
 function openModal(src){
 modalImg.src=src;
 imgModal.style.display="flex";
 }
-
 function closeModal(){
 imgModal.style.display="none";
 }
@@ -376,7 +365,6 @@ document.querySelectorAll("input,select").forEach(el=>{
 el.addEventListener("input",filterProducts);
 el.addEventListener("change",filterProducts);
 });
-
 categoryFilter.addEventListener("change",updateTypeOptions);
 
 fetchData();
@@ -384,4 +372,3 @@ fetchData();
 </script>
 </body>
 </html>
-
