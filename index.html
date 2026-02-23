@@ -231,11 +231,10 @@ input,select{
   <span class="close" onclick="closeModal()">×</span>
   <img id="modalImg">
 </div>
+
 <script>
 
 let products=[];
-
-/* CATEGORY → TYPE MAP */
 
 const typeMap={
 "TV":["HD Ready","FHD","UHD","OLED","NanoCell"],
@@ -244,18 +243,13 @@ const typeMap={
 "AV":["SoundBar","XBoom"]
 };
 
-/* DARK MODE */
-
 function toggleDark(){
   document.body.classList.toggle("dark");
 }
 
-/* FETCH DATA */
-
 async function fetchData(){
 
 const SHEET_ID="1y87usdTNDTIbCGwvyjaUmwReye_O9J1qEGMm_7YI_BM";
-
 const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
 
 const res=await fetch(url);
@@ -265,7 +259,6 @@ const json=JSON.parse(text.substring(47,text.length-2));
 const rows=json.table.rows;
 
 products=rows.map(r=>({
-
 sku:r.c[0]?.v||"",
 category:r.c[1]?.v||"",
 type:r.c[2]?.v||"",
@@ -276,55 +269,37 @@ description:r.c[6]?.v||"",
 image:r.c[7]?.v||"",
 stock:parseInt(r.c[8]?.v||0),
 location:r.c[9]?.v||""
-
 }));
 
 populateLocations();
 updateTypeOptions();
 filterProducts();
-
 }
 
-/* LOCATION DROPDOWN */
-
 function populateLocations(){
-
 const locations=[...new Set(products.map(p=>p.location).filter(Boolean))];
-
 const select=document.getElementById("locationFilter");
-
 locations.forEach(loc=>{
   const opt=document.createElement("option");
   opt.value=loc;
   opt.textContent=loc;
   select.appendChild(opt);
 });
-
 }
 
-/* UPDATE TYPE BASED ON CATEGORY */
-
 function updateTypeOptions(){
-
 const category=document.getElementById("categoryFilter").value;
 const typeSelect=document.getElementById("typeFilter");
-
 typeSelect.innerHTML="<option value=''>All Types</option>";
-
 if(typeMap[category]){
-
 typeMap[category].forEach(t=>{
   const opt=document.createElement("option");
   opt.value=t;
   opt.textContent=t;
   typeSelect.appendChild(opt);
 });
-
 }
-
 }
-
-/* FILTER */
 
 function filterProducts(){
 
@@ -334,7 +309,6 @@ const type=document.getElementById("typeFilter").value;
 const rating=document.getElementById("ratingFilter").value;
 const stockF=document.getElementById("stockFilter").value;
 const location=document.getElementById("locationFilter").value;
-
 const resultsDiv=document.getElementById("results");
 
 const filtered=products.filter(p=>{
@@ -353,33 +327,23 @@ return matchSearch&&matchCat&&matchType&&matchRating&&matchStock&&matchLocation;
 
 });
 
-/* SUMMARY */
-
 document.getElementById("totalCount").innerText=filtered.length;
 document.getElementById("inStockCount").innerText=filtered.filter(p=>p.stock>0).length;
 document.getElementById("outStockCount").innerText=filtered.filter(p=>p.stock===0).length;
 
-/* LOCATION DASH */
-
 const locTotals={};
-
 filtered.forEach(p=>{
   if(!locTotals[p.location]) locTotals[p.location]=0;
   locTotals[p.location]+=p.stock;
 });
 
 const dash=document.getElementById("locationDash");
-
 dash.innerHTML="<b>Stock by Location</b><br>";
-
 for(let loc in locTotals){
   dash.innerHTML+=`📍 ${loc}: ${locTotals[loc]} units<br>`;
 }
 
-/* RENDER */
-
 resultsDiv.innerHTML="";
-
 if(filtered.length===0){
   resultsDiv.innerHTML="<div class='no-result'>No match found</div>";
   return;
@@ -391,31 +355,20 @@ const div=document.createElement("div");
 div.className="product";
 
 const stars="⭐".repeat(parseInt(p.rating||0));
-
 const stockBadge=p.stock>0
 ?`<span class="badge in">In Stock (${p.stock})</span>`
 :`<span class="badge out">Out of Stock</span>`;
 
 div.innerHTML=`
-
 ${p.image?`<img src="${p.image}" onclick="openModal('${p.image}')">`:""}
-
 <div class="details">
-
 <div class="sku">${p.sku}</div>
-
 <div class="small">${p.category} • ${p.type} • ${stars}</div>
-
 <div class="small">${p.capacity}</div>
-
 <div>${p.description}</div>
-
 <div class="small">📍 ${p.location}</div>
-
 ${stockBadge}
-
 </div>
-
 `;
 
 resultsDiv.appendChild(div);
@@ -423,8 +376,6 @@ resultsDiv.appendChild(div);
 });
 
 }
-
-/* IMAGE MODAL */
 
 function openModal(src){
 document.getElementById("modalImg").src=src;
@@ -434,8 +385,6 @@ document.getElementById("imgModal").style.display="flex";
 function closeModal(){
 document.getElementById("imgModal").style.display="none";
 }
-
-/* EVENTS */
 
 document.getElementById("categoryFilter").addEventListener("change",()=>{
 updateTypeOptions();
@@ -452,4 +401,3 @@ fetchData();
 </script>
 </body>
 </html>
-:::
