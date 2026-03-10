@@ -2,410 +2,218 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LG Product Lookup</title>
-<link rel="icon" type="image/svg+xml" href="https://upload.wikimedia.org/wikipedia/commons/2/20/LG_symbol.svg">
+<title>LG Model Price List</title>
 
 <style>
-:root{
-  --bg:#f4f6f8;
-  --card:#ffffff;
-  --text:#222;
-  --sub:#666;
-}
-
-body.dark{
-  --bg:#121212;
-  --card:#1e1e1e;
-  --text:#f5f5f5;
-  --sub:#bbbbbb;
-}
 
 body{
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial;
-  background:var(--bg);
-  color:var(--text);
+font-family:Arial;
+margin:0;
+padding:15px;
+background:#f5f5f5;
 }
 
 .header{
-  background:linear-gradient(135deg,#a50034,#d81b60);
-  color:white;
-  padding:18px;
-  border-radius:0 0 18px 18px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+text-align:center;
+margin-bottom:20px;
 }
 
-.toggle{
-  background:white;
-  border:none;
-  padding:6px 10px;
-  border-radius:6px;
-  cursor:pointer;
+.header img{
+width:250px;
+margin-bottom:10px;
 }
 
-.container{ padding:15px; }
-
-input,select{
-  width:100%;
-  padding:10px;
-  margin-bottom:10px;
-  border-radius:8px;
-  border:1px solid #ccc;
-  background:var(--card);
-  color:var(--text);
+.search{
+margin-bottom:15px;
 }
 
-.summary{
-  display:flex;
-  gap:10px;
-  margin-bottom:12px;
-  flex-wrap:wrap;
+input{
+width:100%;
+padding:10px;
+font-size:16px;
+border-radius:6px;
+border:1px solid #ccc;
 }
 
-.summary-card{
-  flex:1;
-  background:var(--card);
-  border-radius:10px;
-  padding:10px;
-  text-align:center;
-  box-shadow:0 4px 10px rgba(0,0,0,0.15);
+.filters{
+display:flex;
+flex-wrap:wrap;
+gap:6px;
+margin-bottom:20px;
 }
 
-.locationDash{
-  background:var(--card);
-  border-radius:10px;
-  padding:10px;
-  margin-bottom:12px;
-  box-shadow:0 4px 10px rgba(0,0,0,0.15);
+.filters button{
+padding:6px 10px;
+border:none;
+background:#e0e0e0;
+border-radius:4px;
+cursor:pointer;
+font-size:13px;
 }
 
-.product{
-  background:var(--card);
-  border-radius:12px;
-  padding:12px;
-  margin-bottom:12px;
-  display:flex;
-  gap:12px;
-  align-items:center;
-  box-shadow:0 6px 14px rgba(0,0,0,0.15);
+.filters button:hover{
+background:#c62828;
+color:white;
 }
 
-.product img{
-  width:90px;
-  height:90px;
-  object-fit:contain;
-  border-radius:8px;
-  cursor:pointer;
+.products{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+gap:15px;
 }
 
-.details{ flex:1; }
-
-.sku{
-  font-weight:bold;
-  font-size:16px;
+.card{
+background:white;
+padding:15px;
+border-radius:10px;
+box-shadow:0 2px 6px rgba(0,0,0,0.1);
 }
 
-.small{
-  font-size:13px;
-  color:var(--sub);
-  margin-top:3px;
+.model{
+font-weight:bold;
+font-size:16px;
 }
 
-.no-result{
-  text-align:center;
-  margin-top:20px;
+.category{
+font-size:12px;
+color:#777;
+margin-bottom:6px;
 }
 
-.modal{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.9);
-  justify-content:center;
-  align-items:center;
+.price{
+font-size:14px;
 }
 
-.modal img{
-  max-width:95%;
-  max-height:95%;
-  border-radius:10px;
+.dp{
+color:#d32f2f;
+font-weight:bold;
 }
 
-.close{
-  position:absolute;
-  top:20px;
-  right:20px;
-  color:white;
-  font-size:30px;
-  cursor:pointer;
+.desc{
+font-size:13px;
+margin-top:6px;
+color:#444;
 }
+
 </style>
 </head>
 
 <body>
 
 <div class="header">
-  <h2>LG Product Lookup - 10th March</h2>
-  <button class="toggle" onclick="toggleDark()">🌙 Dark</button>
-</div>
 
-<div class="container">
+<img src="https://drive.google.com/uc?export=view&id=1o4Qscq-Vo2CsQNnn7eJLclze50bz2M9A">
 
-<input type="text" id="search" placeholder="Enter SKU">
-
-<select id="categoryFilter">
-<option value="">All Categories</option>
-<option>Washing Machine</option>
-<option>TV</option>
-<option>AC</option>
-<option>Dish Washer</option>
-<option>Water Purifier</option>
-<option>Microwave Oven</option>
-<option>Refrigerator</option>
-<option>AV</option>
-</select>
-
-<select id="typeFilter">
-<option value="">All Types</option>
-</select>
-
-<select id="ratingFilter">
-<option value="">All Ratings</option>
-<option value="1">⭐</option>
-<option value="2">⭐⭐</option>
-<option value="3">⭐⭐⭐</option>
-<option value="4">⭐⭐⭐⭐</option>
-<option value="5">⭐⭐⭐⭐⭐</option>
-</select>
-
-<select id="stockFilter">
-<option value="">All Stock</option>
-<option value="in">In Stock</option>
-<option value="out">Out of Stock</option>
-</select>
-
-<select id="locationFilter">
-<option value="">All Locations</option>
-<option>Azamgarh</option>
-<option>Bhadohi</option>
-<option>Deoria</option>
-<option>Ghazipur</option>
-<option>Jaunpur</option>
-<option>Kushinagar</option>
-<option>Mau</option>
-<option>Mirzapur</option>
-<option>Mughalsarai</option>
-<option>Prayagraj</option>
-<option>Gilat Bazar</option>
-<option>Medical Road</option>
-<option>Kareli</option>
-<option>Ravindrapuri</option>
-<option>Pandeypur</option>
-<option>Ramnagar</option>
-<option>SUNDERPUR</option>
-<option>Saulemasarai</option>
-<option>LUXA</option>
-</select>
-
-<div class="summary">
-  <div class="summary-card">Total Models<br><b id="totalCount">0</b></div>
-  <div class="summary-card">In Stock<br><b id="inStockCount">0</b></div>
-  <div class="summary-card">Out Stock<br><b id="outStockCount">0</b></div>
-</div>
-
-<div class="locationDash" id="locationDash"></div>
-<div id="results"></div>
+<h2>LG Model Price List</h2>
 
 </div>
 
-<div class="modal" id="imgModal">
-  <span class="close" onclick="closeModal()">×</span>
-  <img id="modalImg">
+<div class="search">
+<input type="text" id="searchInput" placeholder="Search Model...">
 </div>
+
+<div class="filters">
+
+<button onclick="setCategory('ALL')">ALL</button>
+<button onclick="setCategory('AUDIO')">AUDIO</button>
+<button onclick="setCategory('DC')">DC</button>
+<button onclick="setCategory('FAN & APR')">FAN & APR</button>
+<button onclick="setCategory('FL-WM & DWASH')">FL-WM & DWASH</button>
+<button onclick="setCategory('FPD')">FPD</button>
+<button onclick="setCategory('French Door')">French Door</button>
+<button onclick="setCategory('MWO')">MWO</button>
+<button onclick="setCategory('RAC')">RAC</button>
+<button onclick="setCategory('SA-WM')">SA-WM</button>
+<button onclick="setCategory('SIDE BY SID')">SIDE BY SID</button>
+<button onclick="setCategory('TF-MODELS')">TF-MODELS</button>
+<button onclick="setCategory('TL-WM')">TL-WM</button>
+<button onclick="setCategory('WATER Purifier')">WATER Purifier</button>
+
+</div>
+
+<div class="products" id="productList"></div>
 
 <script>
 
-let products=[];
+let sheetID="YOUR_SHEET_ID";
+let sheetName="Sheet1";
 
-const LOCATIONS=[
-"Azamgarh","Bhadohi","Deoria","Ghazipur","Jaunpur",
-"Kushinagar","Mau","Mirzapur","Mughalsarai","Prayagraj",
-"Gilat Bazar","Medical Road","Kareli","Ravindrapuri",
-"Pandeypur","Ramnagar","SUNDERPUR","Saulemasarai","LUXA"
-];
+let url=`https://opensheet.elk.sh/${sheetID}/${sheetName}`;
 
-const typeMap={
-"TV":["HD Ready","FHD","UHD","OLED","NanoCell"],
-"Washing Machine":["Top Load","Front Load","Automatic","Semi-Automatic"],
-"AC":["Split","Window","Inverter"],
-"AV":["SoundBar","XBoom"]
-};
+let allData=[];
+let currentCategory="ALL";
 
-function toggleDark(){
-  document.body.classList.toggle("dark");
-}
-
-async function fetchData(){
-
-const SHEET_ID="1y87usdTNDTIbCGwvyjaUmwReye_O9J1qEGMm_7YI_BM";
-const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
-
-const res=await fetch(url);
-const text=await res.text();
-const json=JSON.parse(text.substring(47,text.length-2));
-const rows=json.table.rows;
-
-products=rows.map(r=>({
-sku:r.c[0]?.v||"",
-category:r.c[1]?.v||"",
-type:r.c[2]?.v||"",
-automation:r.c[3]?.v||"",
-rating:r.c[4]?.v?.toString()||"",
-capacity:r.c[5]?.v||"",
-description:r.c[6]?.v||"",
-image:r.c[7]?.v||"",
-Azamgarh:parseInt(r.c[8]?.v||0),
-Bhadohi:parseInt(r.c[9]?.v||0),
-Deoria:parseInt(r.c[10]?.v||0),
-Ghazipur:parseInt(r.c[11]?.v||0),
-Jaunpur:parseInt(r.c[12]?.v||0),
-Kushinagar:parseInt(r.c[13]?.v||0),
-Mau:parseInt(r.c[14]?.v||0),
-Mirzapur:parseInt(r.c[15]?.v||0),
-Mughalsarai:parseInt(r.c[16]?.v||0),
-Prayagraj:parseInt(r.c[17]?.v||0),
-"Gilat Bazar":parseInt(r.c[18]?.v||0),
-"Medical Road":parseInt(r.c[19]?.v||0),
-Kareli:parseInt(r.c[20]?.v||0),
-Ravindrapuri:parseInt(r.c[21]?.v||0),
-Pandeypur:parseInt(r.c[22]?.v||0),
-Ramnagar:parseInt(r.c[23]?.v||0),
-SUNDERPUR:parseInt(r.c[24]?.v||0),
-Saulemasarai:parseInt(r.c[25]?.v||0),
-LUXA:parseInt(r.c[26]?.v||0)
-}));
-
-updateTypeOptions();
-filterProducts();
-}
-
-function totalStock(p){
-return LOCATIONS.reduce((sum,loc)=>sum+p[loc],0);
-}
-
-function updateTypeOptions(){
-typeFilter.innerHTML="<option value=''>All Types</option>";
-if(typeMap[categoryFilter.value]){
-typeMap[categoryFilter.value].forEach(t=>{
-let opt=document.createElement("option");
-opt.value=t;
-opt.textContent=t;
-typeFilter.appendChild(opt);
-});
-}
-}
-
-function filterProducts(){
-
-let query=search.value.toUpperCase();
-let category=categoryFilter.value;
-let type=typeFilter.value;
-let rating=ratingFilter.value;
-let stockF=stockFilter.value;
-let location=locationFilter.value;
-
-let filtered=products.filter(p=>{
-let matchSearch=p.sku.toUpperCase().includes(query);
-let matchCat=!category||p.category===category;
-let matchType=!type||p.type===type||p.automation===type;
-let matchRating=!rating||p.rating===rating;
-let matchLocation=!location||p[location]>0;
-
-let matchStock=true;
-if(stockF==="in") matchStock=location?p[location]>0:totalStock(p)>0;
-if(stockF==="out") matchStock=location?p[location]===0:totalStock(p)===0;
-
-return matchSearch&&matchCat&&matchType&&matchRating&&matchLocation&&matchStock;
+fetch(url)
+.then(res=>res.json())
+.then(data=>{
+allData=data;
+showProducts(data);
 });
 
-totalCount.innerText=filtered.length;
-inStockCount.innerText=filtered.filter(p=>location?p[location]>0:totalStock(p)>0).length;
-outStockCount.innerText=filtered.filter(p=>location?p[location]===0:totalStock(p)===0).length;
+function showProducts(data){
 
-let dashHTML="<b>Stock by Location</b><br>";
+let html="";
 
-if(location){
-let totalLoc=filtered.reduce((sum,p)=>sum+p[location],0);
-if(totalLoc>0) dashHTML+=`${location}: ${totalLoc} units`;
-}else{
-LOCATIONS.forEach(loc=>{
-let totalLoc=filtered.reduce((sum,p)=>sum+p[loc],0);
-if(totalLoc>0) dashHTML+=`${loc}: ${totalLoc} units<br>`;
-});
-}
-locationDash.innerHTML=dashHTML;
+data.forEach(item=>{
 
-results.innerHTML="";
-if(filtered.length===0){
-results.innerHTML="<div class='no-result'>No match found</div>";
-return;
-}
+html+=`
 
-filtered.forEach(p=>{
+<div class="card">
 
-let activeLocations=LOCATIONS
-.filter(loc=>p[loc]>0)
-.map(loc=>`${loc}: ${p[loc]}`);
+<div class="model">${item.MODEL}</div>
 
-let locText=location
-? `${location}: ${p[location]}`
-: activeLocations.join(" | ");
+<div class="category">${item.Category}</div>
 
-let stars="⭐".repeat(parseInt(p.rating||0));
+<div class="price">MRP : ₹${item.MRP}</div>
 
-results.innerHTML+=`
-<div class="product">
-${p.image?`<img src="${p.image}" onclick="openModal('${p.image}')">`:""}
-<div class="details">
-<div class="sku">${p.sku}</div>
-<div class="small">${p.category} • ${p.type} • ${p.automation} • ${stars}</div>
-<div class="small">${p.capacity}</div>
-<div class="small">${p.description}</div>
-<div class="small">${locText}</div>
-<div class="small"><b>Total: ${totalStock(p)}</b></div>
+<div class="price dp">DP : ₹${item.DP}</div>
+
+<div class="price">GST : ${item["GST %"]}%</div>
+
+<div class="price">CAT : ${item.CAT}</div>
+
+<div class="desc">${item.Description}</div>
+
 </div>
-</div>
+
 `;
 
 });
 
+document.getElementById("productList").innerHTML=html;
+
 }
 
-function openModal(src){
-modalImg.src=src;
-imgModal.style.display="flex";
+function setCategory(cat){
+
+currentCategory=cat;
+applyFilters();
+
 }
 
-function closeModal(){
-imgModal.style.display="none";
-}
+document.getElementById("searchInput").addEventListener("keyup",applyFilters);
 
-document.querySelectorAll("input,select").forEach(el=>{
-el.addEventListener("input",filterProducts);
-el.addEventListener("change",filterProducts);
+function applyFilters(){
+
+let search=document.getElementById("searchInput").value.toLowerCase();
+
+let filtered=allData.filter(item=>{
+
+let categoryMatch=currentCategory==="ALL" || item.Category===currentCategory;
+
+let searchMatch=
+item.MODEL.toLowerCase().includes(search) ||
+item.Description.toLowerCase().includes(search);
+
+return categoryMatch && searchMatch;
+
 });
 
-categoryFilter.addEventListener("change",updateTypeOptions);
+showProducts(filtered);
 
-fetchData();
+}
 
 </script>
+
 </body>
 </html>
-
-
-
-
-
